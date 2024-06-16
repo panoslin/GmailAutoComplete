@@ -1,19 +1,67 @@
-.autocomplete-suggestions {
-    position: absolute;
+.tribute-container {
     background-color: white;
-    border: 1px solid #ccc;
-    z-index: 1000;
+    border: 1px solid #d1d1d1;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+    padding: 4px;
+    max-width: 300px;
+    margin-top: 4px;
+    z-index: 999999;
 }
 
-.autocomplete-suggestion {
-    padding: 8px;
+.tribute-container .item {
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease;
     cursor: pointer;
 }
 
-.autocomplete-suggestion:hover {
-    background-color: #f0f0f0;
+.tribute-container .item:hover {
+    background-color: #f5f5f5;
 }
 
-.autocomplete-suggestion.highlight {
-    background-color: #ddd;
+.tribute-container .item.active {
+    background-color: #007aff;
+    color: white;
+}
+
+.selected-item {
+    display: inline-block;
+    background-color: #007aff;
+    /*color: white;*/
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    margin: 2px;
+    cursor: default;
+}
+
+.loading {
+    display: none;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    color: #007aff;
+}
+
+.loading .spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid #ccc;
+    border-top: 2px solid #007aff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 4px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
