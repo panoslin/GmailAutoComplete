@@ -34,9 +34,3 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.storage.sync.set({autocompleteEnabled});
     });
 });
-
-chrome.storage.sync.get(['apiToken', 'selectedModel', 'autocompleteEnabled'], (result) => {
-    console.log('API Token:', result.apiToken);
-    console.log('Selected Model:', result.selectedModel);
-    console.log('Autocomplete Enabled:', result.autocompleteEnabled);
-});

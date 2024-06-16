@@ -8,7 +8,7 @@ document.addEventListener('input', function (event) {
                 apiToken = result.apiToken;
                 selectedModel = result.selectedModel;
                 autocompleteEnabled = result.autocompleteEnabled;
-                console.log(apiToken, selectedModel, autocompleteEnabled);
+                // console.log(apiToken, selectedModel, autocompleteEnabled);
             }
         );
         if (apiToken && autocompleteEnabled) {
@@ -73,13 +73,13 @@ document.addEventListener('input', function (event) {
                     }
 
                     async function remoteSearch(text, cb) {
-                        console.log(text);
+                        // console.log(text);
                         let requestID = ++tribute.requestID % 1000;
                         // let suggestions = await getSuggestions(text);
                         getEmailSuggestions(apiToken, text).then(suggestions => {
-                            console.log(suggestions, text);
+                            // console.log(suggestions, text);
                             suggestions = suggestions.map((s, i) => ({key: s, value: s}));
-                            console.log(requestID, tribute.requestID, suggestions);
+                            // console.log(requestID, tribute.requestID, suggestions);
                             if (suggestions.length > 0 && requestID === tribute.requestID) {
                                 cb(suggestions);
                             }
