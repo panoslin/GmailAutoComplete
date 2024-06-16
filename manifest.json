@@ -2,11 +2,8 @@
   "manifest_version": 3,
   "name": "Gmail AutoComplete",
   "version": "1.0",
-  "description": "An auto-complete feature for the Gmail email editor.",
-  "permissions": ["activeTab", "storage"],
-  "background": {
-    "service_worker": "background.js"
-  },
+  "description": "Streamline your email writing with intelligent text suggestions that save time and improve accuracy.",
+  "permissions": ["storage"],
   "content_scripts": [
     {
       "matches": ["https://mail.google.com/*"],
