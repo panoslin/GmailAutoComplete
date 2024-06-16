@@ -1,17 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Gmail AutoComplete</title>
+    <meta charset="UTF-8">
+    <title>ChatGPT Settings</title>
     <style>
         body {
-            width: 200px;
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+            background-color: #f9f9f9;
+            color: #333;
+            width: 300px;
+            height: 250px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="password"],
+        select {
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box; /* Ensures padding is included in the width */
+        }
+        .toggle-button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toggle-button input {
+            margin: 0;
         }
     </style>
 </head>
 <body>
-<h1>Gmail AutoComplete</h1>
-<p>Extension is active.</p>
-<script src="popup.js"></script>
+    <div class="container">
+        <div class="form-group">
+            <label for="api-token">ChatGPT Token</label>
+            <input type="password" id="api-token" placeholder="Enter your ChatGPT token" />
+        </div>
+        <div class="form-group">
+            <label for="model-select">Select Model</label>
+            <select id="model-select">
+                <option value="gpt-3.5-turbo" >gpt-3.5-turbo</option>
+                <option value="gpt-4o">gpt-4o</option>
+            </select>
+        </div>
+        <div class="toggle-button">
+            <input type="checkbox" id="autocomplete-toggle" />
+            <label for="autocomplete-toggle">Enable Auto-Complete</label>
+        </div>
+    </div>
+    <script src="popup.js"></script>
 </body>
 </html>
