@@ -19,18 +19,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // Save API token
     apiTokenInput.addEventListener('input', () => {
         const apiToken = apiTokenInput.value;
-        chrome.storage.sync.set({apiToken});
+        chrome.storage.sync.set({
+            'apiToken': apiToken,
+        }, () => {
+            console.log('API token saved:', apiToken);
+        });
     });
 
     // Save selected model
     modelSelect.addEventListener('change', () => {
         const selectedModel = modelSelect.value;
-        chrome.storage.sync.set({selectedModel});
+        chrome.storage.sync.set({
+            'selectedModel': selectedModel,
+        }, () => {
+            console.log('Selected model saved:', selectedModel);
+        });
     });
 
     // Save autocomplete toggle state
     autocompleteToggle.addEventListener('change', () => {
         const autocompleteEnabled = autocompleteToggle.checked;
-        chrome.storage.sync.set({autocompleteEnabled});
+        chrome.storage.sync.set({
+            'autocompleteEnabled': autocompleteEnabled,
+        }, () => {
+            console.log('Autocomplete toggle state saved:', autocompleteEnabled);
+        });
     });
 });

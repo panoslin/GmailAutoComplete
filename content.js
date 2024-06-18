@@ -4,13 +4,6 @@ let autocompleteEnabled = false;
 const autoCompleteRegisteredElements = new Map();
 
 document.addEventListener('input', function (event) {
-        chrome.storage.sync.get(['apiToken', 'selectedModel', 'autocompleteEnabled'], (result) => {
-                apiToken = result.apiToken;
-                selectedModel = result.selectedModel;
-                autocompleteEnabled = result.autocompleteEnabled;
-                // console.log(apiToken, selectedModel, autocompleteEnabled);
-            }
-        );
         if (apiToken && autocompleteEnabled) {
             if (event.target.isContentEditable || event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
                 if (!autoCompleteRegisteredElements.has(event.target)) {
