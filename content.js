@@ -203,6 +203,8 @@ async function getEmailSuggestions(apiToken, context, model = selectedModel) {
 
     } catch (error) {
         console.error(`An error occurred: ${error}`);
+        // log the error trace
+        console.trace(error);
         return [];
     }
 }

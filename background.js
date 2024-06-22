@@ -5,12 +5,47 @@ function getUserPreferences() {
             apiToken = result.apiToken;
             selectedModel = result.selectedModel;
             autocompleteEnabled = result.autocompleteEnabled;
-            // console.log(apiToken, selectedModel, autocompleteEnabled);
+            console.log(apiToken, selectedModel, autocompleteEnabled);
         }
     );
 }
 
-// Periodically check User Preference Updates
+function adjustLayout(node) {
+    const toolBar = node.querySelector('table.iN tbody tr:nth-child(2)');
+    if (toolBar) {
+        toolBar.style.zIndex = '1';
+    }
+    const editor = node.querySelector('div.qz.aiL');
+    if (editor) {
+        editor.style.zIndex = '2';
+        editor.style.position = 'relative';
+    }
+}
+
+function setObserver() {
+    const targetNode = document.querySelector('body.aAU.YxcKdf');
+    const config = {childList: true, subtree: true};
+    const callback = function (mutationsList, observer) {
+        for (let mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === 1 && node.classList.contains('M9')) {
+                        getUserPreferences();
+                        adjustLayout(node);
+                    }
+                });
+            }
+        }
+    };
+    const observer = new MutationObserver(callback);
+    observer.observe(targetNode, config);
+}
+
 const intervalId = setInterval(() => {
-    getUserPreferences();
-}, 5000);
+    if (document.querySelector('div.Am')) {
+        getUserPreferences();
+        adjustLayout(document);
+        setObserver();
+        clearInterval(intervalId);
+    }
+}, 1000);
