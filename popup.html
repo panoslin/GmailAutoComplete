@@ -10,8 +10,8 @@
             margin: 0;
             background-color: #f9f9f9;
             color: #333;
-            width: 300px;
-            height: 250px;
+            width: 450px;
+            height: 550px; /* Adjusted to accommodate the new text box */
             box-sizing: border-box;
         }
 
@@ -20,16 +20,21 @@
             flex-direction: column;
             gap: 15px;
         }
+
         .form-group {
             display: flex;
             flex-direction: column;
             gap: 5px;
+
         }
+
         label {
             font-weight: bold;
         }
+
         input[type="password"],
-        select {
+        select,
+        textarea {
             padding: 8px;
             font-size: 14px;
             border: 1px solid #ccc;
@@ -37,34 +42,45 @@
             width: 100%;
             box-sizing: border-box; /* Ensures padding is included in the width */
         }
+
+        textarea {
+            height: 300px; /* Adjust as needed */
+        }
+
         .toggle-button {
             display: flex;
             align-items: center;
             gap: 10px;
         }
+
         .toggle-button input {
             margin: 0;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="form-group">
-            <label for="api-token">ChatGPT Token</label>
-            <input type="password" id="api-token" placeholder="Enter your ChatGPT token" />
-        </div>
-        <div class="form-group">
-            <label for="model-select">Select Model</label>
-            <select id="model-select">
-                <option value="gpt-3.5-turbo" >gpt-3.5-turbo</option>
-                <option value="gpt-4o">gpt-4o</option>
-            </select>
-        </div>
-        <div class="toggle-button">
-            <input type="checkbox" id="autocomplete-toggle" />
-            <label for="autocomplete-toggle">Enable Auto-Complete</label>
-        </div>
+<div class="container">
+    <div class="form-group">
+        <label for="api-token">ChatGPT Token</label>
+        <input type="password" id="api-token" placeholder="Enter your ChatGPT token"/>
     </div>
-    <script src="popup.js"></script>
+    <div class="form-group">
+        <label for="model-select">Select Model</label>
+        <select id="model-select">
+            <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+            <option value="gpt-4o">gpt-4o</option>
+        </select>
+    </div>
+    <div class="toggle-button">
+        <input type="checkbox" id="autocomplete-toggle"/>
+        <label for="autocomplete-toggle">Enable Auto-Complete</label>
+    </div>
+    <div class="form-group">
+        <label for="user-prompt">User Prompt</label>
+        <textarea id="user-prompt"
+                  placeholder="You are designed to assist with drafting emails by providing short, concise text predictions based on the user's input. Upon receiving the context or partial content of an email, you will offer a list of 6 possible completions in JSON format (e.g. following the exact format of '{&quot;suggestions&quot;: [&quot;How are you?&quot;, &quot;Thank you&quot;, &quot;Meeting update&quot;]}'), each suggestion ranging from 1 to 5 words, focusing solely on delivering these suggestions without any additional explanations. Please be aware that you are required to provide the necessary punctuations and spaces (e.g. prefix or suffix spaces or puctuations if missing in the user provided origin content). Your provided suggestions should be able to be simply appended to the end of the origin text without needing any extra work to concat them."></textarea>
+    </div>
+</div>
+<script src="popup.js"></script>
 </body>
 </html>

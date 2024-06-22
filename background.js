@@ -1,11 +1,12 @@
-console.log('Background script running');
+// console.log('Background script running');
 
 function getUserPreferences() {
-    chrome.storage.sync.get(['apiToken', 'selectedModel', 'autocompleteEnabled'], (result) => {
+    chrome.storage.sync.get(['apiToken', 'selectedModel', 'autocompleteEnabled', 'userPrompt'], (result) => {
             apiToken = result.apiToken;
-            selectedModel = result.selectedModel;
+            selectedModel = result.selectedModel || 'gpt-3.5-turbo';
             autocompleteEnabled = result.autocompleteEnabled;
-            console.log(apiToken, selectedModel, autocompleteEnabled);
+            userPrompt = result.userPrompt || defaultPrompt;
+            console.log(apiToken, selectedModel, autocompleteEnabled, userPrompt);
         }
     );
 }

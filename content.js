@@ -1,10 +1,12 @@
 let apiToken;
 let selectedModel = 'gpt-3.5-turbo';
+let defaultPrompt = `You are designed to assist with drafting emails by providing short, concise text predictions based on the user's input. Upon receiving the context or partial content of an email, you will offer a list of 6 possible completions in JSON format (e.g. following the exact format of '{"suggestions": ["How are you?", "Thank you", "Meeting update"]}'), each suggestion ranging from 1 to 5 words, focusing solely on delivering these suggestions without any additional explanations. Please be aware that you are required to provide the necessary punctuations and spaces (e.g. prefix or suffix spaces or puctuations if missing in the user provided origin content). Your provided suggestions should be able to be simply appended to the end of the origin text without needing any extra work to concat them.`
+let userPrompt = defaultPrompt;
 let autocompleteEnabled = false;
 const autoCompleteRegisteredElements = new Map();
 
 document.addEventListener('input', function (event) {
-        if (apiToken && autocompleteEnabled) {
+        if (apiToken && autocompleteEnabled && userPrompt) {
             if (event.target.isContentEditable || event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
                 if (!autoCompleteRegisteredElements.has(event.target)) {
                     const editableElement = event.target;
@@ -146,28 +148,13 @@ document.addEventListener('input', function (event) {
 async function getEmailSuggestions(apiToken, context, model = selectedModel) {
     /**
      * Fetches email suggestions using OpenAI's GPT model.
-     *
-     * @param {string} apiToken - The API key for OpenAI.
-     * @param {string} context - The context or partial content of an email.
-     * @param {string} model - The model to use for generating suggestions (default is 'gpt-3.5-turbo').
-     * @returns {Promise<Array<string>>} - A list of suggested email completions.
      */
     try {
         // Prepare the request
         const messages = [
             {
                 role: "system",
-                content: `You are designed to assist with drafting emails by providing short, concise text 
-                        predictions based on the user's input. Upon receiving the context or partial content of an email, 
-                        you will offer a list of 6 possible completions in JSON format 
-                        (e.g. following the exact format of 
-                        '{"suggestions": ["How are you?", "Thank you", "Meeting update"]}'
-                        ), 
-                        each suggestion ranging from 1 to 5 words, 
-                        focusing solely on delivering these suggestions without any additional explanations. 
-                        Please be aware that you are required to provide the necessary puctuations and spaces 
-                        (e.g. prefix or suffix spaces if missing in the origin text)
-                        Your suggestions should be able to simply append to the end of the origin text`
+                content: userPrompt
             },
             {
                 role: "user",
