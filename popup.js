@@ -1,58 +1,68 @@
 // console.log('Popup script running');
 
-document.addEventListener('DOMContentLoaded', () => {
-    addPopUpListener();
-})
+document.addEventListener('DOMContentLoaded', function() {
+  const modelSelect = document.getElementById('model');
+  const apiKeyInput = document.getElementById('apiKey');
+  const toggleVisibilityBtn = document.querySelector('.toggle-visibility');
+  const saveButton = document.getElementById('save');
+  const statusDiv = document.getElementById('status');
 
-function addPopUpListener() {
-    console.log('DOM content loaded');
-    const apiTokenInput = document.getElementById('api-token');
-    const modelSelect = document.getElementById('model-select');
-    const autocompleteToggle = document.getElementById('autocomplete-toggle');
-    const userPromptInput = document.getElementById('user-prompt');
+  // Load saved settings
+  chrome.storage.sync.get(['selectedModel', 'apiToken'], function(result) {
+    if (result.selectedModel) {
+      modelSelect.value = result.selectedModel;
+    }
+    if (result.apiToken) {
+      apiKeyInput.value = result.apiToken;
+    }
+  });
 
-    // Load stored settings
-    chrome.storage.sync.get(['apiToken', 'selectedModel', 'autocompleteEnabled', 'userPrompt'], (result) => {
-        if (result.apiToken) {
-            apiTokenInput.value = result.apiToken;
+  // Toggle API key visibility
+  toggleVisibilityBtn.addEventListener('click', function() {
+    const type = apiKeyInput.type;
+    apiKeyInput.type = type === 'password' ? 'text' : 'password';
+    // Using HTML entity references for better compatibility
+    toggleVisibilityBtn.innerHTML = type === 'password' ? '&#128065;&#xFE0F;' : '&#128065;';
+  });
+
+  // Save settings
+  saveButton.addEventListener('click', function() {
+    const model = modelSelect.value;
+    const apiKey = apiKeyInput.value;
+
+    if (!apiKey) {
+      showStatus('Please enter an API key', 'error');
+      return;
+    }
+
+    chrome.storage.sync.set({
+      selectedModel: model,
+      apiToken: apiKey
+    }, function() {
+      showStatus('Settings saved successfully! ✓', 'success');
+      
+      // Notify content script of the changes
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        if (tabs[0]) {
+          chrome.tabs.sendMessage(tabs[0].id, {
+            action: 'updateSettings',
+            settings: {
+              selectedModel: model,
+              apiToken: apiKey
+            }
+          });
         }
-
-        if (result.selectedModel) {
-            modelSelect.value = result.selectedModel;
-        }
-
-        autocompleteToggle.checked = result.autocompleteEnabled;
-
-        if (result.userPrompt) {
-            userPromptInput.value = result.userPrompt;
-        } else {
-            userPromptInput.value = `You are designed to assist with drafting emails by providing short, concise text predictions based on the user's input. Upon receiving the context or partial content of an email, you will offer a list of 6 possible completions in JSON format (e.g. following the exact format of '{"suggestions": ["How are you?", "Thank you", "Meeting update"]}'), each suggestion ranging from 1 to 5 words, focusing solely on delivering these suggestions without any additional explanations. Please be aware that you are required to provide the necessary punctuations and spaces (e.g. prefix or suffix spaces or puctuations if missing in the user provided origin content). Your provided suggestions should be able to be simply appended to the end of the origin text without needing any extra work to concat them.`;
-        }
-
+      });
     });
+  });
 
-    // Save API token
-    apiTokenInput.addEventListener('input', () => {
-        const apiToken = apiTokenInput.value;
-        chrome.storage.sync.set({'apiToken': apiToken}, () => {});
-    });
-
-    // Save selected model
-    modelSelect.addEventListener('change', () => {
-        const selectedModel = modelSelect.value;
-        chrome.storage.sync.set({'selectedModel': selectedModel}, () => {});
-    });
-
-    // Save autocomplete toggle state
-    autocompleteToggle.addEventListener('change', () => {
-        const autocompleteEnabled = autocompleteToggle.checked;
-        chrome.storage.sync.set({'autocompleteEnabled': autocompleteEnabled}, () => {});
-    });
-
-    // Save user prompt
-    userPromptInput.addEventListener('input', () => {
-        const userPrompt = userPromptInput.value;
-        chrome.storage.sync.set({'userPrompt': userPrompt}, () => {});
-    });
-
-}
+  function showStatus(message, type) {
+    statusDiv.textContent = message;
+    statusDiv.className = `status ${type}`;
+    statusDiv.style.display = 'block';
+    
+    setTimeout(() => {
+      statusDiv.style.display = 'none';
+    }, 3000);
+  }
+});

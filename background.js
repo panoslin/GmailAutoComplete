@@ -1,52 +1,58 @@
-// console.log('Background script running');
+// Background service worker
+console.log('Background service worker initialized');
 
-function getUserPreferences() {
-    chrome.storage.sync.get(['apiToken', 'selectedModel', 'autocompleteEnabled', 'userPrompt'], (result) => {
-            apiToken = result.apiToken;
-            selectedModel = result.selectedModel || 'gpt-3.5-turbo';
-            autocompleteEnabled = result.autocompleteEnabled;
-            userPrompt = result.userPrompt || defaultPrompt;
-            console.log(apiToken, selectedModel, autocompleteEnabled, userPrompt);
-        }
-    );
-}
+let apiToken;
+let selectedModel = 'gpt-3.5-turbo';
 
-function adjustLayout(node) {
-    const toolBar = node.querySelector('table.iN tbody tr:nth-child(2)');
-    if (toolBar) {
-        toolBar.style.zIndex = '1';
-    }
-    const editor = node.querySelector('div.qz.aiL');
-    if (editor) {
-        editor.style.zIndex = '2';
-        editor.style.position = 'relative';
-    }
-}
+// Create context menu items
+chrome.runtime.onInstalled.addListener(() => {
+  console.log('Extension installed/updated');
+  
+  // Parent menu item
+  chrome.contextMenus.create({
+    id: 'improveEmail',
+    title: 'Improve Email ✨',
+    contexts: ['selection']
+  });
 
-function setObserver() {
-    const targetNode = document.querySelector('body.aAU.YxcKdf');
-    const config = {childList: true, subtree: true};
-    const callback = function (mutationsList, observer) {
-        for (let mutation of mutationsList) {
-            if (mutation.type === 'childList') {
-                mutation.addedNodes.forEach(node => {
-                    if (node.nodeType === 1 && node.classList.contains('M9')) {
-                        getUserPreferences();
-                        adjustLayout(node);
-                    }
-                });
-            }
-        }
-    };
-    const observer = new MutationObserver(callback);
-    observer.observe(targetNode, config);
-}
+  // Sub-menu items
+  const menuItems = [
+    { id: 'summary', title: 'Summarize 📝' },
+    { id: 'shorten', title: 'Make it Shorter ✂️' },
+    { id: 'friendly', title: 'Make it Friendly 😊' },
+    { id: 'response', title: 'Generate Response 💬' },
+    { id: 'complete', title: 'Complete Email 📧' },
+    { id: 'proofread', title: 'Proofread 🔍' },
+    { id: 'academic', title: 'Academic Style 🎓' },
+    { id: 'business', title: 'Business Style 💼' }
+  ];
 
-const intervalId = setInterval(() => {
-    if (document.querySelector('div.Am')) {
-        getUserPreferences();
-        adjustLayout(document);
-        setObserver();
-        clearInterval(intervalId);
-    }
-}, 1000);
+  menuItems.forEach(item => {
+    chrome.contextMenus.create({
+      id: item.id,
+      parentId: 'improveEmail',
+      title: item.title,
+      contexts: ['selection']
+    });
+  });
+});
+
+// Handle context menu clicks
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId && info.selectionText) {
+    chrome.tabs.sendMessage(tab.id, {
+      action: 'improveText',
+      improvementType: info.menuItemId,
+      x: info.x,
+      y: info.y
+    });
+  }
+});
+
+// Listen for messages from popup
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'updateSettings') {
+    apiToken = request.settings.apiToken;
+    selectedModel = request.settings.selectedModel;
+  }
+});

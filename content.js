@@ -1,198 +1,246 @@
 let apiToken;
 let selectedModel = 'gpt-3.5-turbo';
-let defaultPrompt = `You are designed to assist with drafting emails by providing short, concise text predictions based on the user's input. Upon receiving the context or partial content of an email, you will offer a list of 6 possible completions in JSON format (e.g. following the exact format of '{"suggestions": ["How are you?", "Thank you", "Meeting update"]}'), each suggestion ranging from 1 to 5 words, focusing solely on delivering these suggestions without any additional explanations. Please be aware that you are required to provide the necessary punctuations and spaces (e.g. prefix or suffix spaces or puctuations if missing in the user provided origin content). Your provided suggestions should be able to be simply appended to the end of the origin text without needing any extra work to concat them.`
-let userPrompt = defaultPrompt;
-let autocompleteEnabled = false;
-const autoCompleteRegisteredElements = new Map();
 
-document.addEventListener('input', function (event) {
-        if (apiToken && autocompleteEnabled && userPrompt) {
-            if (event.target.isContentEditable || event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
-                if (!autoCompleteRegisteredElements.has(event.target)) {
-                    const editableElement = event.target;
-                    let tribute = new Tribute(
-                        {
-                            menuContainer: editableElement.parentNode,
-                            autocompleteMode: true,
-                            containerClass: 'tribute-container',
-                            selectClass: "selected-item",
-                            requireLeadingSpace: false,
-                            allowSpaces: true,
-                            // spaceSelectsMatch: true,
-                            menuItemLimit: 9999,
-                            menuShowMinLength: 1,
-                            // noMatchTemplate: "",
-                            searchOpts: {
-                                pre: '',
-                                post: '',
-                                skip: true
-                            },
-                            loadingItemTemplate: '<div class="loading"><div class="spinner"></div>ChatGPT Loading...</div>',
-                            values: debounce(async function (text, cb) {
-                                const fullText = getTextBeforeCaret();
-                                const loading = document.querySelector("div.loading");
-                                if (loading) {
-                                    loading.style.display = "inline-flex";
-                                }
-                                await remoteSearch(fullText, users => cb(users));
-                            }, 800),
-                            // function called on select that returns the content to insert
-                            selectTemplate: function (item) {
-                                if (typeof item === "undefined") return null;
-                                return `<span class="marker">${item.original.key}</span>`;
-                            },
-                            menuItemTemplate: function (item) {
-                                return `<div class="item">${item.string}</div>`;
-                            }
-                        }
-                    );
-                    // add event target as k, tribute as value into autoCompleteRegisteredElements
-                    autoCompleteRegisteredElements.set(event.target, tribute);
+// Load initial settings
+chrome.storage.sync.get(['selectedModel', 'apiToken'], function(result) {
+  if (result.selectedModel) {
+    selectedModel = result.selectedModel;
+  }
+  if (result.apiToken) {
+    apiToken = result.apiToken;
+  }
+});
 
-                    tribute.requestID = 0;
-                    tribute.attach(editableElement);
+// Listen for settings updates from popup
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'updateSettings') {
+    selectedModel = request.settings.selectedModel;
+    apiToken = request.settings.apiToken;
+    console.log('Settings updated:', { selectedModel, apiToken: '***' });
+  }
+});
 
-                    function getTextBeforeCaret() {
-                        const sel = window.getSelection();
-                        let textBeforeCaret = '';
+// Style for the improvement popup
+const popupStyles = `
+  .email-improvement-popup {
+    position: fixed;
+    z-index: 10000;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 20px;
+    max-width: 500px;
+    width: 100%;
+    display: none;
+  }
+  .email-improvement-popup h3 {
+    margin: 0 0 10px 0;
+    color: #1a73e8;
+  }
+  .email-improvement-popup .result {
+    margin: 10px 0;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+  }
+  .email-improvement-popup .close-btn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+    padding: 5px;
+    background: none;
+    border: none;
+    font-size: 18px;
+  }
+`;
 
-                        if (sel.rangeCount > 0) {
-                            const range = sel.getRangeAt(0);
-                            const preCaretRange = range.cloneRange();
-                            preCaretRange.selectNodeContents(editableElement);
-                            preCaretRange.setEnd(range.endContainer, range.endOffset);
-                            textBeforeCaret = preCaretRange.toString();
-                        }
+// Add styles to the page
+const styleSheet = document.createElement('style');
+styleSheet.textContent = popupStyles;
+document.head.appendChild(styleSheet);
 
-                        return textBeforeCaret;
-                    }
+// Create popup element
+const popup = document.createElement('div');
+popup.className = 'email-improvement-popup';
+popup.innerHTML = `
+  <button class="close-btn">×</button>
+  <h3>Email Improvement</h3>
+  <div class="result"></div>
+`;
+document.body.appendChild(popup);
 
-                    async function remoteSearch(text, cb) {
-                        // console.log(text);
-                        let requestID = ++tribute.requestID % 1000;
-                        // let suggestions = await getSuggestions(text);
-                        getEmailSuggestions(apiToken, text).then(suggestions => {
-                            // console.log(suggestions, text);
-                            suggestions = suggestions.map((s, i) => ({key: s, value: s}));
-                            // console.log(requestID, tribute.requestID, suggestions);
-                            if (suggestions.length > 0 && requestID === tribute.requestID) {
-                                cb(suggestions);
-                            }
-                        });
-                    }
+// Close button functionality
+popup.querySelector('.close-btn').addEventListener('click', () => {
+  popup.style.display = 'none';
+});
 
-                    function debounce(func, wait) {
-                        let timeout;
-                        return function (...args) {
-                            const context = this;
-                            clearTimeout(timeout);
-                            timeout = setTimeout(() => func.apply(context, args), wait);
-                        };
-                    }
-
-                    // Don't show the loading indicator when the selection menu show up
-                    editableElement.addEventListener('tribute-active-true', function (event) {
-                            let loading = document.querySelector("div.loading");
-                            if (loading) {
-                                loading.style.display = "none";
-                            }
-                        }
-                    );
-
-                    // Overwrite Tribute.js default replace behavior
-                    // append selectedText over replace
-                    editableElement.addEventListener('tribute-replaced',
-                        function (event) {
-                            // remove child with class .marker
-                            if (event.target.tagName === 'INPUT') {
-                                // Parse the string as HTML
-                                let parser = new DOMParser();
-                                let doc = parser.parseFromString(event.target.value, 'text/html');
-                                let marker = doc.querySelector('span.marker');
-                                if (marker) {
-                                    marker.nextSibling.remove();
-                                    marker.previousSibling.nodeValue = marker.previousSibling.nodeValue.trimEnd() + " " + event.detail.context.mentionText + event.detail.item.string;
-                                    marker.parentNode.removeChild(marker);
-                                    event.target.value = doc.body.textContent;
-                                }
-                            } else {
-                                const marker = editableElement.querySelector('.marker');
-                                if (marker) {
-                                    // remove &nbsp after the marker;
-                                    marker.nextSibling.remove();
-                                    marker.previousSibling.nodeValue = marker.previousSibling.nodeValue.trimEnd() + " " + event.detail.context.mentionText + event.detail.item.string;
-                                    const range = document.createRange();
-                                    const sel = window.getSelection();
-                                    range.setStartAfter(marker.previousSibling);
-                                    range.collapse(true);
-                                    sel.removeAllRanges();
-                                    sel.addRange(range);
-                                    marker.parentNode.removeChild(marker);
-                                }
-
-                            }
-                        });
-                }
-            }
-        } else {
-            // detach the element from tribute
-            if (autoCompleteRegisteredElements.has(event.target)) {
-                const tribute = autoCompleteRegisteredElements.get(event.target);
-                tribute.detach(event.target);
-                autoCompleteRegisteredElements.delete(event.target);
-            }
-        }
-    }
-)
-
-async function getEmailSuggestions(apiToken, context, model = selectedModel) {
-    /**
-     * Fetches email suggestions using OpenAI's GPT model.
-     */
-    try {
-        // Prepare the request
-        const messages = [
-            {
-                role: "system",
-                content: userPrompt
-            },
-            {
-                role: "user",
-                content: context
-            }
-        ];
-
-        // Make the API call
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${apiToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: model,
-                messages: messages,
-                n: 1,
-                frequency_penalty: 1.0
-            })
-        });
-
-        const completion = await response.json();
-
-        // Process the response
-        if (completion.choices[0].finish_reason === 'length') {
-            console.log("Completion finished with incomplete output, please try again with more context");
-            console.log(completion.choices[0].message.content);
-            return [];
-        }
-
-        return JSON.parse(completion.choices[0].message.content).suggestions || [];
-
-    } catch (error) {
-        console.error(`An error occurred: ${error}`);
-        // log the error trace
-        console.trace(error);
-        return [];
-    }
+// Function to get selected text
+function getSelectedText() {
+  const selection = window.getSelection();
+  return selection.toString().trim();
 }
+
+// Function to improve text using AI
+async function improveText(text, improvementType) {
+  const prompts = {
+    summary: "Summarize this email text concisely:",
+    shorten: "Make this text shorter while maintaining the key message:",
+    friendly: "Make this text more friendly and approachable:",
+    response: "Draft a professional response to this email:",
+    complete: "Complete this email in a professional manner:",
+    proofread: "Proofread and improve this text:",
+    academic: "Rewrite this in a formal academic style:",
+    business: "Rewrite this in a professional business style:"
+  };
+
+  const prompt = prompts[improvementType] || "Improve this text:";
+  
+  try {
+    let response;
+    let result;
+
+    switch(selectedModel) {
+      case 'gpt-3.5-turbo':
+      case 'gpt-4o':
+        // OpenAI API
+        response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiToken}`
+          },
+          body: JSON.stringify({
+            model: selectedModel,
+            messages: [
+              {
+                role: "system",
+                content: "You are a professional email writing assistant."
+              },
+              {
+                role: "user",
+                content: `${prompt}\n\n${text}`
+              }
+            ],
+            temperature: 0.7
+          })
+        });
+        const openAIData = await response.json();
+        result = openAIData.choices[0].message.content;
+        break;
+
+      case 'claude-2':
+        // Anthropic Claude API
+        response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiToken,
+            'anthropic-version': '2023-06-01'
+          },
+          body: JSON.stringify({
+            model: 'claude-2',
+            max_tokens: 1024,
+            messages: [{
+              role: 'user',
+              content: `${prompt}\n\n${text}`
+            }]
+          })
+        });
+        const claudeData = await response.json();
+        result = claudeData.content[0].text;
+        break;
+
+      case 'llama-2':
+        // Example for a local LLaMA 2 API endpoint
+        response = await fetch('http://localhost:8000/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiToken}`
+          },
+          body: JSON.stringify({
+            model: 'llama-2-70b-chat',
+            messages: [
+              {
+                role: "system",
+                content: "You are a professional email writing assistant."
+              },
+              {
+                role: "user",
+                content: `${prompt}\n\n${text}`
+              }
+            ],
+            temperature: 0.7
+          })
+        });
+        const llamaData = await response.json();
+        result = llamaData.choices[0].message.content;
+        break;
+
+      case 'grok-1':
+        // Example for Grok API (when available)
+        response = await fetch('https://api.grok.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiToken}`
+          },
+          body: JSON.stringify({
+            model: 'grok-1',
+            messages: [
+              {
+                role: "system",
+                content: "You are a professional email writing assistant."
+              },
+              {
+                role: "user",
+                content: `${prompt}\n\n${text}`
+              }
+            ]
+          })
+        });
+        const grokData = await response.json();
+        result = grokData.choices[0].message.content;
+        break;
+
+      default:
+        throw new Error('Unsupported model selected');
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error:', error);
+    if (error.message === 'Unsupported model selected') {
+      return 'Error: The selected AI model is not supported. Please choose a different model in the settings.';
+    }
+    return 'Error processing your request. Please check your API key and try again.';
+  }
+}
+
+// Function to show improvement result
+function showImprovement(result, x, y) {
+  const resultDiv = popup.querySelector('.result');
+  resultDiv.textContent = result;
+  popup.style.display = 'block';
+  popup.style.left = `${x}px`;
+  popup.style.top = `${y}px`;
+}
+
+// Listen for messages from background script
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'improveText') {
+    const selectedText = getSelectedText();
+    if (selectedText) {
+      improveText(selectedText, request.improvementType)
+        .then(result => {
+          showImprovement(result, request.x, request.y);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showImprovement('Error processing your request. Please try again.', request.x, request.y);
+        });
+    }
+  }
+});
 
