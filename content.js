@@ -20,46 +20,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-// Style for the improvement popup
-const popupStyles = `
-  .email-improvement-popup {
-    position: fixed;
-    z-index: 10000;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    padding: 20px;
-    max-width: 500px;
-    width: 100%;
-    display: none;
-  }
-  .email-improvement-popup h3 {
-    margin: 0 0 10px 0;
-    color: #1a73e8;
-  }
-  .email-improvement-popup .result {
-    margin: 10px 0;
-    padding: 10px;
-    background: #f8f9fa;
-    border-radius: 4px;
-  }
-  .email-improvement-popup .close-btn {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    cursor: pointer;
-    padding: 5px;
-    background: none;
-    border: none;
-    font-size: 18px;
-  }
-`;
-
-// Add styles to the page
-const styleSheet = document.createElement('style');
-styleSheet.textContent = popupStyles;
-document.head.appendChild(styleSheet);
-
 // Create popup element
 const popup = document.createElement('div');
 popup.className = 'email-improvement-popup';
