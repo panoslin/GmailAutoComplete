@@ -45,7 +45,7 @@ This Chrome extension enhances your Gmail composing experience by providing inte
 
 2. **Configure the Extension**:
    - Click the extension icon in Chrome toolbar
-   - Enter your API key ([**How to get the token?**](##API-Key-Setup))
+   - Enter your API key ([**How to get the token?**](#API-Key-Setup))
    - Select your preferred AI model
 
    <img src="./README.assets/image-20241220182532391.png" alt="Settings Screenshot" style="zoom:40%;" />
