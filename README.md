@@ -1,76 +1,107 @@
-# Gmail Auto-Complete Chrome Extension
+# Gmail Email Assistant Chrome Extension
 
-This Chrome extension enhances your Gmail composing experience by providing intelligent auto-complete suggestions using OpenAI's ChatGPT. The extension offers short, concise text predictions based on your input, helping you draft emails more efficiently.
+This Chrome extension enhances your Gmail composing experience by providing intelligent email improvements using various AI models. The extension offers a powerful three-panel diff view to compare and review AI-suggested improvements to your email text.
 
-<img src="README.assets/7.png" alt="Screenshot 2024-06-22 at 19.45.00" style="zoom:40%;" />
+<img src="./README.assets/image-20241220182940746.png" alt="Usage Screenshot" style="zoom:40%;" />
+
+<img src="./README.assets/image-20241220182313777.png" alt="Extension Screenshot" style="zoom:40%;" />
 
 ## Features
 
-- **API Token Storage**: Securely store your ChatGPT API token completely locally.
-- **Model Selection**: Choose between `gpt-3.5-turbo` and `gpt-4o`.
-- **User Prompt Configuration**: Customize the prompt sent to ChatGPT.
+- **Multiple AI Models Support**: Choose from various AI models:
+  - OpenAI GPT-3.5 Turbo and GPT-4
+  - Anthropic Claude 2
+  - LLaMA 2
+  - Grok 1
 
+- **Smart Email Improvements**:
+  - **Summarize** emails 📝
+  - Make text **shorter** ✂️
+  - Make text more **friendly** 😊
+  - Generate **responses** 💬
+  - **Complete** emails 📧
+  - **Proofread** content 🔍
+  - Convert to **academic** style 🎓
+  - Convert to **business** style 💼
 
+- **Advanced Diff Comparison**:
+  - Three-panel diff view for **easy comparison**
+  - Original text, modified text, and changes view
+  - Synchronized scrolling option
+  - Multiple diff modes (Words/Chars/Lines)
+  - Color-coded additions and deletions
+
+- **User-Friendly Interface**:
+  - Context menu integration
+  - Easy-to-use settings popup
+  - Secure API key storage
+  - Copy, accept, or cancel changes
+  - Toast notifications for errors
+  - Loading indicators
+
+## Installation
+
+1. **Install from [Chrome Web Store](https://chromewebstore.google.com/detail/gmail-autocomplete/jpbpagapiifleboecbkfljelpeknlbcl)**
+
+2. **Configure the Extension**:
+   - Click the extension icon in Chrome toolbar
+   - Enter your API key ([**How to get the token?**](##API-Key-Setup))
+   - Select your preferred AI model
+
+   <img src="./README.assets/image-20241220182532391.png" alt="Settings Screenshot" style="zoom:40%;" />
 
 ## Usage
 
-1. **Install extension from [Chrome Web Store](https://chromewebstore.google.com/detail/gmail-autocomplete/jpbpagapiifleboecbkfljelpeknlbcl)**
+1. **Open Gmail** and compose or reply to an email
 
-   
+2. **Select Text** you want to improve
 
-   
+3. **Right-Click** and choose "Improve Email ✨" from the context menu
 
-2. **Open the Extension**
+4. **Choose Improvement Type**:
+   - Summarize
+   - Shorten
+   - Make Friendly
+   - Generate Response
+   - Complete Email
+   - Proofread
+   - Academic Style
+   - Business Style
 
-   - Click on the extension icon in the Chrome toolbar to open the settings popup.
+5. **Review Changes** in the three-panel diff view:
+   - Left panel: Original text
+   - Middle panel: Modified text
+   - Right panel: Color-coded changes
 
-   	<img src="README.assets/11.png" alt="Screenshot 2024-06-23 at 13.02.21" style="zoom:40%;" />
+6. **Use the Controls**:
+   - Toggle synchronized scrolling
+   - Switch between diff modes
+   - Copy, accept, or cancel changes
 
-3. **Configure Settings**
+## API Key Setup
 
-   - **ChatGPT Token**: Enter your ChatGPT API token. This token is required for the extension to communicate with the OpenAI API. ([**How to get the token?**](#Create-ChatGPT-API-Token))
+1. Add credit balance to [OpenAI Platform](https://platform.openai.com/settings/organization/billing/overview) (Minimum $5)
 
-   - **Select Model**: Choose your preferred ChatGPT model (`gpt-3.5-turbo` or `gpt-4o`).
+   <img src="./README.assets/5.png" alt="Billing Screenshot" style="zoom:40%;" />
 
-   - **Enable Auto-Complete**: Toggle the auto-complete functionality on or off.
+2. Create an API Key from [OpenAI Dashboard](https://platform.openai.com/api-keys)
 
-   - **User Prompt**: Customize the prompt sent to ChatGPT. The default prompt is:
-     
-     ```tex
-     You are designed to assist with drafting emails by providing short, concise text predictions based on the user's input. Upon receiving the context or partial content of an email, you will offer a list of 6 possible completions in JSON format (e.g. following the exact format of '{"suggestions": ["How are you?", "Thank you", "Meeting update"]}'), each suggestion ranging from 1 to 5 words, focusing solely on delivering these suggestions without any additional explanations. Please be aware that you are required to provide the necessary punctuations and spaces (e.g. prefix or suffix spaces if missing in the origin text). Your suggestions should be able to simply append to the end of the origin text.
-     ```
-     
-     
+   <img src="./README.assets/4.png" alt="API Key Screenshot" style="zoom:40%;" />
 
-4. **Compose an Email**
+3. Enter your API key in the extension settings
 
-   - Open [Gmail](gmail.com) and start composing an email. The extension will provide auto-complete suggestions as you type based on the configured settings.
+   <img src="./README.assets/image-20241220182532391.png" alt="Settings Screenshot" style="zoom:40%;" />
 
-## Create ChatGPT API Token
+4. Start improving your emails with AI assistance!
 
-1. Add credit balance to [ChatGPT](https://platform.openai.com/settings/organization/billing/overview) if not yet (At least $5)
-
-	<img src="./README.assets/5.png" alt="Screenshot 2024-06-17 at 00.13.02" style="zoom:40%;" />
-
-2. Create a ChatGPT API Key from [the dashboard](https://platform.openai.com/api-keys)
-
-	<img src="./README.assets/4.png" alt="Screenshot 2024-06-17 at 00.10.22" style="zoom:40%;" />
-
-3. Paste your API token to the extension's popup menu.
-
-	<img src="README.assets/12.png" style="zoom:40%;" />
-
-4. Enjoy the ChatGPT-Powered Email Auto-Completion.
-
-	<img src="README.assets/9.png" alt="Screenshot 2024-06-22 at 19.45.37" style="zoom:40%;" />
-
-	<img src="README.assets/8.png" alt="Screenshot 2024-06-22 at 19.45.00" style="zoom:40%;" />
-
-
+   <img src="./README.assets/image-20241220182940746.png" alt="Usage Screenshot" style="zoom:40%;" />
 
 ## Contributing
 
-We welcome contributions! Please open an issue or submit a pull request for any changes or enhancements.
+We welcome contributions! Please feel free to:
+- Open issues for bugs or feature requests
+- Submit pull requests with improvements
+- Share feedback and suggestions
 
 ## License
 
@@ -78,5 +109,7 @@ This project is licensed under the MIT License. See the [LICENSE](https://github
 
 ## Contact
 
-For any questions or support, please open an issue on the [GitHub repository](https://github.com/panoslin/GmailAutoComplete/issues) or contact us directly at lghpanos@gmail.com.
+For questions, support, or feedback:
+- Open an issue on [GitHub](https://github.com/panoslin/GmailAutoComplete/issues)
+- Email us at lghpanos@gmail.com
 
