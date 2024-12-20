@@ -23,28 +23,37 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-// Create popup element with diff view
+// Create popup element with three-panel diff view
 const popup = document.createElement('div');
 popup.className = 'email-improvement-popup';
 popup.innerHTML = `
-  <h3>
-    <button class="close-btn">×</button>
-  </h3>
-  <div class="diff-container">
-    <div>
-      <div class="diff-title">Original Text</div>
-      <div class="diff-original"></div>
+  <div class="popup-header">
+    <div class="diff-mode-selector">
+      <label><input type="radio" name="diffMode" value="words" checked> Words</label>
+      <label><input type="radio" name="diffMode" value="chars"> Chars</label>
+      <label><input type="radio" name="diffMode" value="lines"> Lines</label>
     </div>
-    <div>
-      <div class="diff-title">Improved Version</div>
-      <div class="diff-improved"></div>
+    <button class="close-btn">×</button>
+  </div>
+  <div class="three-panel-diff">
+    <div class="diff-panel">
+      <div class="diff-title">Original</div>
+      <div class="diff-content diff-original"></div>
+    </div>
+    <div class="diff-panel">
+      <div class="diff-title">Modified</div>
+      <div class="diff-content diff-modified"></div>
+    </div>
+    <div class="diff-panel">
+      <div class="diff-title">Changes</div>
+      <div class="diff-content diff-changes"></div>
     </div>
   </div>
   <div class="diff-actions">
-    <button class="diff-copy-btn">
-      <span>📋</span> Copy
-    </button>
     <div class="diff-right-actions">
+      <button class="diff-copy-btn">
+        <span>📋</span> Copy
+      </button>
       <button class="diff-cancel-btn">
         <span>✕</span> Cancel
       </button>
@@ -71,7 +80,7 @@ popup.querySelector('.diff-cancel-btn').addEventListener('click', () => {
 // Accept button functionality
 popup.querySelector('.diff-accept-btn').addEventListener('click', () => {
   if (storedRange && originalText) {
-    const improvedText = popup.querySelector('.diff-improved').textContent;
+    const improvedText = popup.dataset.improvedText;
     replaceSelectedText(improvedText);
     popup.style.display = 'none';
     storedRange = null;
@@ -192,23 +201,40 @@ function replaceSelectedText(newText) {
 
 // Function to compute diff between two texts
 function computeDiff(oldText, newText) {
-  const diff = Diff.diffWords(oldText, newText);
+  // Use diffWords from the library
+  const diff = Diff.diffWords(oldText, newText, { ignoreWhitespace: false });
   let originalHtml = '';
-  let improvedHtml = '';
+  let modifiedHtml = '';
+  let changesHtml = '';
   
-  diff.forEach(part => {
+  diff.forEach((part) => {
     const value = part.value;
-    if (part.added) {
-      improvedHtml += `<span class="diff-highlight-added">${value}</span>`;
-    } else if (part.removed) {
-      originalHtml += `<span class="diff-highlight-removed">${value}</span>`;
+    const escapedValue = value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    
+    // Original text shows all parts except additions
+    if (!part.added) {
+      originalHtml += escapedValue;
     } else {
-      originalHtml += value;
-      improvedHtml += value;
+      originalHtml += ' '.repeat(value.length);
+    }
+    
+    // Modified text shows all parts
+    modifiedHtml += escapedValue;
+    
+    // Changes view shows color-coded differences
+    if (part.added) {
+      changesHtml += `<span class="diff-highlight-added">${escapedValue}</span>`;
+    } else if (part.removed) {
+      changesHtml += `<span class="diff-highlight-removed">${escapedValue}</span>`;
+    } else {
+      changesHtml += escapedValue;
     }
   });
   
-  return { originalHtml, improvedHtml };
+  return { 
+    changesHtml,
+    hasChanges: diff.some(part => part.added || part.removed)
+  };
 }
 
 // Function to show improvement result with diff
@@ -216,11 +242,15 @@ function showImprovement(result, x, y) {
   const diffResult = computeDiff(originalText, result);
   
   const originalDiv = popup.querySelector('.diff-original');
-  const improvedDiv = popup.querySelector('.diff-improved');
+  const modifiedDiv = popup.querySelector('.diff-modified');
+  const changesDiv = popup.querySelector('.diff-changes');
   
-  originalDiv.innerHTML = diffResult.originalHtml;
-  improvedDiv.innerHTML = diffResult.improvedHtml;
-  improvedDiv.textContent = result; // Store the plain text for accepting changes
+  originalDiv.innerText = originalText;
+  modifiedDiv.innerText = result;
+  changesDiv.innerHTML = diffResult.changesHtml;
+  
+  // Store the plain text for accepting changes
+  popup.dataset.improvedText = result;
   
   popup.style.display = 'block';
   
@@ -284,7 +314,7 @@ async function improveText(text, improvementType) {
     friendly: "Make this text more friendly and approachable:",
     response: "Draft a professional response to this email:",
     complete: "Complete this email in a professional manner:",
-    proofread: "Proofread and improve this text:",
+    proofread: "Proofread and improve this email body:",
     academic: "Rewrite this in a formal academic style:",
     business: "Rewrite this in a professional business style:"
   };
@@ -444,5 +474,33 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       showToast('Please select some text to improve');
     }
   }
+});
+
+// Add diff mode change handler
+popup.querySelectorAll('input[name="diffMode"]').forEach(radio => {
+  radio.addEventListener('change', (e) => {
+    const mode = e.target.value;
+    const improvedText = popup.dataset.improvedText;
+    let diff;
+    
+    switch(mode) {
+      case 'chars':
+        diff = computeDiff(originalText, improvedText, Diff.diffChars);
+        break;
+      case 'lines':
+        diff = computeDiff(originalText, improvedText, Diff.diffLines);
+        break;
+      default: // words
+        diff = computeDiff(originalText, improvedText, Diff.diffWords);
+    }
+    
+    const originalDiv = popup.querySelector('.diff-original');
+    const modifiedDiv = popup.querySelector('.diff-modified');
+    const changesDiv = popup.querySelector('.diff-changes');
+    
+    originalDiv.innerText = originalText;
+    modifiedDiv.innerText = improvedText;
+    changesDiv.innerHTML = diff.changesHtml;
+  });
 });
 
