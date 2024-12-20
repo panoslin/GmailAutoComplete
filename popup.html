@@ -1,36 +1,36 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Gmail AutoComplete Settings</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <div class="container">
-    <h2>Email Assistant Settings</h2>
-    
-    <div class="form-group">
-      <label for="model">AI Model:</label>
-      <select id="model">
-        <option value="gpt-3.5-turbo">GPT-3.5 Turbo ⚡</option>
-        <option value="gpt-4o">GPT-4o 🧠</option>
-        <option value="claude-2">Claude 2 🤖</option>
-        <option value="llama-2">LLaMA 2 🦙</option>
-        <option value="grok-1">Grok 1 🤔</option>
-      </select>
-    </div>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gmail AutoComplete Settings</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Email Assistant Settings</h2>
 
-    <div class="form-group">
-      <label for="apiKey">API Key:</label>
-      <div class="api-key">
-        <input type="password" id="apiKey" placeholder="Enter your API key">
-        <button class="toggle-visibility" type="button">&#128065;</button>
+      <div class="form-group">
+        <label for="model">AI Model:</label>
+        <select id="model">
+          <option value="gpt-3.5-turbo">GPT-3.5 Turbo ⚡</option>
+          <option value="gpt-4o">GPT-4o 🧠</option>
+          <option value="claude-2">Claude 2 🤖</option>
+          <option value="llama-2">LLaMA 2 🦙</option>
+          <option value="grok-1">Grok 1 🤔</option>
+        </select>
       </div>
-    </div>
 
-    <button id="save">Save Settings</button>
-    <div id="status" class="status"></div>
-  </div>
-  <script src="popup.js"></script>
-</body>
+      <div class="form-group">
+        <label for="apiKey">API Key:</label>
+        <div class="api-key">
+          <input type="password" id="apiKey" placeholder="Enter your API key" />
+          <button class="toggle-visibility" type="button">&#128065;</button>
+        </div>
+      </div>
+
+      <button id="save">Save Settings</button>
+      <div id="status" class="status"></div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
 </html>
