@@ -32,6 +32,7 @@ popup.innerHTML = `
       <label><input type="radio" name="diffMode" value="words" checked> Words</label>
       <label><input type="radio" name="diffMode" value="chars"> Chars</label>
       <label><input type="radio" name="diffMode" value="lines"> Lines</label>
+      <label class="sync-scroll-label"><input type="checkbox" name="syncScroll" checked> Sync Scroll</label>
     </div>
     <button class="close-btn">×</button>
   </div>
@@ -64,6 +65,25 @@ popup.innerHTML = `
   </div>
 `;
 document.body.appendChild(popup);
+
+// Add synchronized scrolling functionality
+const diffPanels = popup.querySelectorAll('.diff-content');
+
+function syncScroll(event) {
+  if (!popup.querySelector('input[name="syncScroll"]').checked) return;
+  
+  const scrolledPanel = event.target;
+  const scrollRatio = scrolledPanel.scrollTop / (scrolledPanel.scrollHeight - scrolledPanel.clientHeight);
+  
+  diffPanels.forEach(panel => {
+    if (panel !== scrolledPanel) {
+      const scrollHeight = panel.scrollHeight - panel.clientHeight;
+      panel.scrollTop = scrollHeight * scrollRatio;
+    }
+  });
+}
+
+diffPanels[2].addEventListener('scroll', syncScroll);
 
 // Close button functionality
 popup.querySelector('.close-btn').addEventListener('click', () => {
