@@ -3,7 +3,7 @@
   "name": "Gmail AutoComplete",
   "version": "2.0",
   "description": "Streamline your email writing with intelligent text suggestions and AI-powered email improvements.",
-  "permissions": ["storage", "contextMenus", "activeTab"],
+  "permissions": ["storage", "contextMenus"],
   "content_scripts": [
     {
       "matches": ["https://mail.google.com/*"],
