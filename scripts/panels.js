@@ -65,12 +65,14 @@ diffPanels[2].addEventListener("scroll", syncScroll);
 // Close button functionality
 popup.querySelector(".close-btn").addEventListener("click", () => {
   popup.style.display = "none";
+  promptDialog.style.display = "none";
   storedRange = null;
 });
 
 // Cancel button functionality
 popup.querySelector(".diff-cancel-btn").addEventListener("click", () => {
   popup.style.display = "none";
+  promptDialog.style.display = "none";
   storedRange = null;
 });
 
@@ -80,6 +82,7 @@ popup.querySelector(".diff-accept-btn").addEventListener("click", () => {
     const improvedText = popup.dataset.improvedText;
     replaceSelectedText(improvedText);
     popup.style.display = "none";
+    promptDialog.style.display = "none";
     storedRange = null;
   }
 });
