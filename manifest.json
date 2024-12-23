@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Gmail AutoComplete",
-  "version": "2.0",
+  "version": "2.1",
   "description": "Streamline your email writing with intelligent text suggestions and AI-powered email improvements.",
   "permissions": ["storage", "contextMenus"],
   "content_scripts": [

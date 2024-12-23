@@ -1,8 +1,12 @@
 # Gmail Email Assistant Chrome Extension
 
-This Chrome extension enhances your Gmail composing experience by providing intelligent email improvements using various AI models. The extension offers a powerful three-panel diff view to compare and review AI-suggested improvements to your email text.
+This Chrome extension enhances your Gmail composing experience by providing intelligent email improvements. The extension offers a powerful three-panel diff view to compare and review AI-suggested improvements to your email text.
 
 <img src="./README.assets/image-20241220182940746.png" alt="Usage Screenshot" style="zoom:40%;" />
+
+<img src="./README.assets/Screenshot 2024-12-23 at 18.06.39.png" alt="Screenshot 2024-12-23 at 18.06.39" style="zoom:40%;" />
+
+
 
 <img src="./README.assets/image-20241220182313777.png" alt="Extension Screenshot" style="zoom:40%;" />
 
@@ -13,7 +17,6 @@ This Chrome extension enhances your Gmail composing experience by providing inte
   - Anthropic Claude 2
   - LLaMA 2
   - Grok 1
-
 - **Smart Email Improvements**:
   - **Summarize** emails 📝
   - Make text **shorter** ✂️
@@ -23,21 +26,17 @@ This Chrome extension enhances your Gmail composing experience by providing inte
   - **Proofread** content 🔍
   - Convert to **academic** style 🎓
   - Convert to **business** style 💼
-
+- **Command Prompt Interface**:
+  - Quick access with **Ctrl+Z**  ⌨️
+  - Command history navigation with up/down arrows ↑↓
+  - Persistent command history 📚
+  - Escape key to close ❌
 - **Advanced Diff Comparison**:
   - Three-panel diff view for **easy comparison**
   - Original text, modified text, and changes view
   - Synchronized scrolling option
   - Multiple diff modes (Words/Chars/Lines)
   - Color-coded additions and deletions
-
-- **User-Friendly Interface**:
-  - Context menu integration
-  - Easy-to-use settings popup
-  - Secure API key storage
-  - Copy, accept, or cancel changes
-  - Toast notifications for errors
-  - Loading indicators
 
 ## Installation
 
@@ -54,26 +53,26 @@ This Chrome extension enhances your Gmail composing experience by providing inte
 
 1. **Open Gmail** and compose or reply to an email
 
-2. **Select Text** you want to improve
+2. **Two Ways to Improve Text**:
 
-3. **Right-Click** and choose "Improve Email ✨" from the context menu
+   ### Method 1: Context Menu
+   - **Select Text** you want to improve
+   - **Right-Click** and choose "Improve Email ✨" from the context menu
+   - Choose from predefined improvement types
 
-4. **Choose Improvement Type**:
-   - Summarize
-   - Shorten
-   - Make Friendly
-   - Generate Response
-   - Complete Email
-   - Proofread
-   - Academic Style
-   - Business Style
+   ### Method 2: Command Prompt
+   - **Select Text** you want to improve
+   - Press **Ctrl+Z**
+   - Type your custom instruction
+   - Use **↑↓** arrows to access command history
+   - Press **Enter** to execute or **Esc** to cancel
 
-5. **Review Changes** in the three-panel diff view:
+3. **Review Changes** in the three-panel diff view:
    - Left panel: Original text
    - Middle panel: Modified text
    - Right panel: Color-coded changes
 
-6. **Use the Controls**:
+4. **Use the Controls**:
    - Toggle synchronized scrolling
    - Switch between diff modes
    - Copy, accept, or cancel changes
