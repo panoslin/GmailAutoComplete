@@ -4,7 +4,7 @@ promptDialog.className = "prompt-input-dialog";
 promptDialog.innerHTML = `
   <div class="prompt-header">
     <span class="prompt-title">New instructions... (↑↓ for history)</span>
-    <div class="prompt-model">gpt-4o</div>
+    <div class="prompt-model" id="prompt-model">${selectedModel}</div>
   </div>
   <input type="text" placeholder="Esc to close" class="prompt-input">
 `;
@@ -124,17 +124,6 @@ promptInput.addEventListener("keydown", async (e) => {
   }
 });
 
-// Close prompt dialog when clicking outside
-document.addEventListener("click", (e) => {
-  if (
-    !promptDialog.contains(e.target) &&
-    promptDialog.style.display === "block"
-  ) {
-    promptDialog.style.display = "none";
-    historyIndex = -1; // Reset history index
-  }
-});
-
 // Reset history navigation when dialog is shown
 document.addEventListener("keydown", async (e) => {
   // Check if text is selected
@@ -152,6 +141,10 @@ document.addEventListener("keydown", async (e) => {
     // Store the selected text and range
     originalText = selection.toString();
     storedRange = selection.getRangeAt(0);
+
+    // Update .prompt-model to be updated accordingly to selectedModel
+    const promptModelElement = promptDialog.querySelector("#prompt-model");
+    promptModelElement.textContent = selectedModel;
 
     // Position and show the prompt dialog near the selection
     const range = selection.getRangeAt(0);

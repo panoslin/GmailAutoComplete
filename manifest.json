@@ -13,9 +13,9 @@
         "scripts/loading.js",
         "scripts/diff.js",
         "scripts/llm.js",
-        "scripts/dialog.js",
         "scripts/panels.js",
-        "scripts/content.js"
+        "scripts/content.js",
+        "scripts/dialog.js"
       ],
       "css": ["styles.css"]
     }
